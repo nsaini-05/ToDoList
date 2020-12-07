@@ -1,37 +1,20 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="css/styles.css">
-  <link href='https://fonts.googleapis.com/css?family=Advent Pro' rel='stylesheet'>
 
-  <title>ToDo list</title>
-</head>
-<body>
-  <div class = "box" id="heading">
-    <h1><%= kindofday%></h1>
-  </div>
+<%- include('header'); -%>
+<div class = "box" id="heading">
+  <h1><%= listTitle%></h1>
+</div>
 
 <div class ="box">
-      <%for (var i = 0; i < itemnames.length; i++) { %>
-        <div class ="item">
+  <%for (var i = 0; i < itemnames.length; i++) { %>
+    <div class ="item">
+      <input type="checkbox" >
+      <p> <%=itemnames[i]%></p>
+    </div>
+    <%}%>
 
-        <input type="checkbox" >
-        <p> <%=itemnames[i]%></p>
-        </div>
-        <%}%>
-
-   <form  class = "item" action="/" method="post">
-
-     <input type="text" placeholder = "NewItem" name = "newitem" autocomplete="off" required>
-
-     <button type = "submit" name="button"> + </button>
-   </form>
- </div>
-
-
-
-
-
-  </body>
-  </html>
+    <form  class = "item" action="/" method="post">
+      <input type="text" placeholder = "NewItem" name = "newitem" autocomplete="off" required>
+      <button type = "submit" name="button" value = <%= listTitle %> > + </button>
+    </form>
+  </div>
+  <%- include('footer'); -%>
