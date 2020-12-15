@@ -5,15 +5,24 @@
 </div>
 
 <div class ="box">
-  <%for (var i = 0; i < itemnames.length; i++) { %>
-    <div class ="item">
-      <input type="checkbox" >
-      <p> <%=itemnames[i]%></p>
-    </div>
-    <%}%>
+
+
+
+<%itemnames.forEach(function(item){%>
+  <form action="/delete" method="post">
+  <div class ="item">
+    <input type="checkbox" onChange="this.form.submit()" name = "checkbox" value = "<%=item._id%>">
+    <p> <%=item.name%></p>
+  </div>
+  <input name="listName" type="hidden" value="<%=listTitle%>"></input>
+  </form>
+  <%});%>
+
+
+
 
     <form  class = "item" action="/" method="post">
-      <input type="text" placeholder = "NewItem" name = "newitem" autocomplete="off" required>
+      <input type="text" placeholder = "New Item" name = "newitem" autocomplete="off" required>
       <button type = "submit" name="button" value = <%= listTitle %> > + </button>
     </form>
   </div>

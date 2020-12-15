@@ -1,62 +1,168 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+var _ = require('lodash');
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
-var items = [];
-var workItems = [];
+
+
+const mongoose = require("mongoose");
+mongoose.connect('mongodb://localhost:27017/taskListDB' , {useNewUrlParser : true , useUnifiedTopology : true});
+
+const taskSchema = {name : String};
+const Task = new mongoose.model("task" , taskSchema);
+
+
+const morning = new Task({name : "Morning"});
+const afternoon = new Task({name : "Afternoon"});
+const night = new Task({name : "Night"});
+const defaultItems = [morning, afternoon , night];
+
+const listSchema = {name : String , items : [taskSchema]};
+const List = new mongoose.model("list" , listSchema);
+
+
+
+
+
 
 app.get("/" , function(req, res)
 {
-  var today = new Date();
-  var options = {
-    weekday : "long",
-    day : "numeric",
-    month : "long"
-  }
-  var day = today.toLocaleDateString("en-US", options);
-  res.render('index' , {listTitle:day , itemnames : items});
+  Task.find({}, function(error, tasks)
+  {
+
+
+    if(tasks.length ===0)
+    {
+      Task.insertMany(defaultItems, function(error)
+      {
+        if(error)
+        {
+          console.log(error);
+        }
+        else {
+          //console.log("Succesfully done ");
+        }
+      });
+      res.redirect("/");
+    }
+    else{
+
+      res.render('index' , {listTitle:"Today" , itemnames : tasks});
+    }
+  });
 });
+
+
+
+app.get('/:listname', function (req, res) {
+  const customListName = _.startCase(req.params.listname);
+
+  List.findOne({name:customListName} , function(err , list){
+    if(!err){
+      if(!list)
+      {
+        const list = new List({name : customListName , items: defaultItems});
+        list.save();
+        res.redirect("/" + customListName );
+
+      }
+      else {
+        res.render("index",  {listTitle:customListName , itemnames : list.items});
+      }
+    }
+
+  });
+});
+
+
+
 
 
 app.post("/", function(req , res)
 {
-  var listName = req.body.button;
-  console.log(req.body);
-  if(listName==="Work")
-  {
-    workItems.push(req.body.newitem);
-    res.redirect("/work");
 
-  }
-  else {
-    items.push(req.body.newitem);
+  const newTaskName = req.body.newitem;
+  const listName = req.body.button;
+  const newTask = new Task({name : newTaskName});
+
+  if(listName === "Today"){
+    newTask.save();
     res.redirect("/");
   }
+  else {
+    List.findOne({name : listName} , function(err, list)
+    {
+      if(!err){
+        list.items.push(newTask);
+        list.save();
+        res.redirect("/" + listName);
+      }
+      else {
+        console.log(err);
+      }
+    })
+
+  }
 
 });
 
 
 
-app.get("/about", function(req , res)
+
+
+app.post("/delete", function(req , res)
 {
-  res.render('about');
+  const listName = req.body.listName;
+  const removeItemid = req.body.checkbox;
+
+  if(listName === "Today"){
+    Task.findByIdAndDelete(removeItemid , function(err){
+      if(!err){  res.redirect("/");}
+    });
+  }
+  else {
+
+    List.findOneAndUpdate({name : listName } , {$pull:{items : {_id: removeItemid}}}, function(err,results){
+      if(!err){res.redirect("/" + listName );}
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
 
 
-app.get("/work", function(req , res)
-{
-  res.render('index' , {listTitle: "Work List" , itemnames:workItems})
-});
-
-
-
-app.post("/work" , function(req , res)
-{
-    workItems.push(req.body.newitem);
-    res.redirect("/work");
-});
 
 
 
