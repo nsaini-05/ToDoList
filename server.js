@@ -8,7 +8,7 @@ app.use(express.static('public'));
 
 
 const mongoose = require("mongoose");
-mongoose.connect('mongodb://localhost:27017/taskListDB' , {useNewUrlParser : true , useUnifiedTopology : true});
+mongoose.connect('mongodb+srv://admin-neeraj:Test123@cluster0.y7iw3.mongodb.net/taskListDB' , {useNewUrlParser : true , useUnifiedTopology : true});
 
 const taskSchema = {name : String};
 const Task = new mongoose.model("task" , taskSchema);
@@ -128,37 +128,6 @@ app.post("/delete", function(req , res)
       if(!err){res.redirect("/" + listName );}
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 });
 
