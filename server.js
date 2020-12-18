@@ -8,7 +8,7 @@ app.use(express.static('public'));
 
 
 const mongoose = require("mongoose");
-mongoose.connect('mongodb+srv://admin-neeraj:Test123@cluster0.y7iw3.mongodb.net/taskListDB' , {useNewUrlParser : true , useUnifiedTopology : true});
+mongoose.connect('' , {useNewUrlParser : true , useUnifiedTopology : true});
 
 const taskSchema = {name : String};
 const Task = new mongoose.model("task" , taskSchema);
